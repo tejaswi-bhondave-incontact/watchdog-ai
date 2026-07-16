@@ -102,8 +102,19 @@ async def get_test_results():
 @app.post("/api/jira-analyze")
 async def analyze_jira(input: JiraInput):
     blindspot = jira_monitor.analyze_ticket(input.ticket_text, input.ticket_id)
-    test_code = test_generator.generate_from_blindspot(blindspot)
-    return {"blindspot": blindspot, "generated_test": test_code}
+    test_result = test_generator.generate_from_blindspot(blindspot)
+    return {
+        "blindspot": {
+            **blindspot,
+            "title": blindspot.get("scenario", ""),
+            "description": blindspot.get("details", ""),
+        },
+        "generated_test": {
+            "code": test_result["test_code"],
+            "language": "python",
+            **test_result,
+        },
+    }
 
 
 @app.post("/api/jira-fetch")
@@ -126,13 +137,21 @@ async def fetch_jira_tickets(input: JiraFetchInput):
             ticket["description"],
             ticket["key"]
         )
-        test_code = test_generator.generate_from_blindspot(blindspot)
+        test_result = test_generator.generate_from_blindspot(blindspot)
         results.append({
             "ticket_key": ticket["key"],
             "summary": ticket["summary"],
             "status": ticket["status"],
-            "blindspot": blindspot,
-            "generated_test": test_code,
+            "blindspot": {
+                **blindspot,
+                "title": blindspot.get("scenario", ""),
+                "description": blindspot.get("details", ""),
+            },
+            "generated_test": {
+                "code": test_result["test_code"],
+                "language": "python",
+                **test_result,
+            },
         })
 
     return {"tickets_analyzed": len(results), "results": results}
