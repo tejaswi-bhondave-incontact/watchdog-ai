@@ -24,11 +24,11 @@ export default function Monitors() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Monitor Sources</h1>
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Monitor Sources</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {monitors.map((m) => (
-          <div key={m.name} className="bg-white border border-gray-200 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow">
+          <div key={m.name} className="bg-white border border-gray-200 rounded shadow-sm p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{icons[m.name] || '📡'}</span>

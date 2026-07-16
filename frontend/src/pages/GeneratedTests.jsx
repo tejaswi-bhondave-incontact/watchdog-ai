@@ -18,18 +18,18 @@ export default function GeneratedTests() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Generated Tests</h1>
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Generated Tests</h1>
 
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="lg:w-1/3">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
             {tests.map((test, i) => (
               <button
                 key={i}
                 onClick={() => setSelected(i)}
                 className={`w-full text-left px-4 py-3 text-sm border-b border-gray-100 last:border-b-0 transition-colors ${
                   selected === i
-                    ? 'bg-indigo-50 text-indigo-700 font-medium'
+                    ? 'bg-blue-50 text-[#0C6CBF] font-medium'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >

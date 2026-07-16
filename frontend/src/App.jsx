@@ -10,9 +10,9 @@ import JiraInput from './pages/JiraInput';
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <Navbar />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="lg:ml-[250px] mt-[50px] p-6">
           <Routes>
             <Route path="/" element={<Overview />} />
             <Route path="/monitors" element={<Monitors />} />

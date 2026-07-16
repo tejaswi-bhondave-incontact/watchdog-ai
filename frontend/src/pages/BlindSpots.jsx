@@ -22,13 +22,13 @@ export default function BlindSpots() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Blind Spots</h1>
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Blind Spots</h1>
 
       <div className="mb-4">
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#0C6CBF]"
         >
           {categories.map((c) => (
             <option key={c} value={c}>{c === 'all' ? 'All Categories' : c}</option>
@@ -36,7 +36,7 @@ export default function BlindSpots() {
         </select>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div className="overflow-x-auto bg-white rounded border border-gray-200 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
