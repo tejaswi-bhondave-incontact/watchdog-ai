@@ -15,8 +15,12 @@ export default function JiraInput() {
     if (!text.trim()) return;
     setLoading(true);
     setResult(null);
-    const data = await apiPost('/api/jira-analyze', { ticket_text: text });
-    setResult(data);
+    try {
+      const data = await apiPost('/api/jira-analyze', { ticket_text: text, ticket_id: 'MANUAL-001' });
+      setResult(data);
+    } catch (e) {
+      setResult({ blindspot: { title: 'Error', description: e.message }, generated_test: { code: '# Error generating test: ' + e.message, language: 'python' } });
+    }
     setLoading(false);
   };
 

@@ -10,10 +10,7 @@ class TestGenerator:
         self.use_bedrock = True
 
     def generate_from_blindspot(self, blindspot: Dict) -> Dict:
-        if self.use_bedrock:
-            test_code = self._generate_with_bedrock(blindspot)
-        else:
-            test_code = self._generate_with_templates(blindspot)
+        test_code = self._generate_with_templates(blindspot)
 
         result = {
             "id": f"test_{len(self.generated_tests) + 1}",

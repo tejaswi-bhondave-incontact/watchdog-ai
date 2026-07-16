@@ -5,7 +5,7 @@ import httpx
 import time
 from datetime import datetime
 
-WATCHDOG_URL = "http://localhost:8000"
+WATCHDOG_URL = "http://localhost:8005"
 SAMPLE_APP_URL = "http://localhost:8001"
 
 NORMAL_TRAFFIC = [
@@ -137,7 +137,7 @@ def main():
     print(f"  Sample App: {SAMPLE_APP_URL}")
     print("=" * 60)
 
-    client = httpx.Client(timeout=30.0)
+    client = httpx.Client(timeout=300.0)
     try:
         simulate_api_traffic(client)
         simulate_log_ingestion(client)
