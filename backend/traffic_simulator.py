@@ -2,8 +2,6 @@
 including edge cases that WatchDog AI will detect."""
 
 import httpx
-import asyncio
-import random
 import time
 from datetime import datetime
 
@@ -65,94 +63,94 @@ SAMPLE_UI_CLICKS = [
 ]
 
 
-async def simulate_api_traffic(client: httpx.AsyncClient):
-    print("\n🔍 [API Traffic Monitor] Sending production traffic...")
+def simulate_api_traffic(client):
+    print("\n[API Traffic Monitor] Sending production traffic...")
     all_traffic = NORMAL_TRAFFIC + EDGE_CASE_TRAFFIC
     for traffic in all_traffic:
         try:
-            # Hit the sample app
             if traffic["method"] == "POST":
-                resp = await client.post(f"{SAMPLE_APP_URL}{traffic['path']}", json=traffic["body"])
+                resp = client.post(f"{SAMPLE_APP_URL}{traffic['path']}", json=traffic["body"])
             else:
-                resp = await client.get(f"{SAMPLE_APP_URL}{traffic['path']}")
+                resp = client.get(f"{SAMPLE_APP_URL}{traffic['path']}")
 
-            # Report to WatchDog
-            await client.post(f"{WATCHDOG_URL}/api/traffic/ingest", json={
+            client.post(f"{WATCHDOG_URL}/api/traffic/ingest", json={
                 "method": traffic["method"],
                 "path": traffic["path"],
                 "body": traffic["body"],
                 "status_code": resp.status_code,
                 "response": resp.text[:200],
             })
-            status_icon = "✅" if resp.status_code < 400 else "⚠️" if resp.status_code < 500 else "❌"
-            print(f"  {status_icon} {traffic['method']} {traffic['path']} → {resp.status_code}")
+            status = "OK" if resp.status_code < 400 else "WARN" if resp.status_code < 500 else "ERR"
+            print(f"  [{status}] {traffic['method']} {traffic['path']} -> {resp.status_code}")
         except Exception as e:
-            print(f"  ❌ {traffic['method']} {traffic['path']} → Error: {e}")
-        await asyncio.sleep(0.2)
+            print(f"  [ERR] {traffic['method']} {traffic['path']} -> {e}")
+        time.sleep(0.1)
 
 
-async def simulate_log_ingestion(client: httpx.AsyncClient):
-    print("\n📋 [Log Monitor] Ingesting application logs...")
+def simulate_log_ingestion(client):
+    print("\n[Log Monitor] Ingesting application logs...")
     for log in SAMPLE_LOGS:
-        await client.post(f"{WATCHDOG_URL}/api/logs/ingest", json=log)
-        icon = "🔴" if log["level"] == "ERROR" else "🟡" if log["level"] == "WARNING" else "🔥"
-        print(f"  {icon} [{log['level']}] {log['message'][:80]}")
-        await asyncio.sleep(0.1)
+        client.post(f"{WATCHDOG_URL}/api/logs/ingest", json=log)
+        print(f"  [{log['level']}] {log['message'][:80]}")
+        time.sleep(0.05)
 
 
-async def simulate_ui_clicks(client: httpx.AsyncClient):
-    print("\n🖱️  [UI Click Monitor] Ingesting user click events...")
+def simulate_ui_clicks(client):
+    print("\n[UI Click Monitor] Ingesting user click events...")
     for click in SAMPLE_UI_CLICKS:
-        await client.post(f"{WATCHDOG_URL}/api/ui-clicks/ingest", json=click)
-        icon = "❌" if click.get("error") else "✅"
-        print(f"  {icon} {click['page']}/{click['element']} {'→ ' + click['error'] if click.get('error') else ''}")
-        await asyncio.sleep(0.1)
+        client.post(f"{WATCHDOG_URL}/api/ui-clicks/ingest", json=click)
+        err = f" -> {click['error']}" if click.get("error") else ""
+        print(f"  {click['page']}/{click['element']}{err}")
+        time.sleep(0.05)
 
 
-async def trigger_scans(client: httpx.AsyncClient):
-    print("\n🔎 [Scanners] Running Git, DB, CI/CD scans...")
-    await client.post(f"{WATCHDOG_URL}/api/git/scan")
-    print("  ✅ Git Diff scan complete")
-    await client.post(f"{WATCHDOG_URL}/api/db/scan")
-    print("  ✅ Database scan complete")
-    await client.post(f"{WATCHDOG_URL}/api/cicd/scan")
-    print("  ✅ CI/CD Pipeline scan complete")
+def trigger_scans(client):
+    print("\n[Scanners] Running Git, DB, CI/CD scans...")
+    client.post(f"{WATCHDOG_URL}/api/git/scan")
+    print("  Git Diff scan complete")
+    client.post(f"{WATCHDOG_URL}/api/db/scan")
+    print("  Database scan complete")
+    client.post(f"{WATCHDOG_URL}/api/cicd/scan")
+    print("  CI/CD Pipeline scan complete")
 
 
-async def generate_and_run_tests(client: httpx.AsyncClient):
-    print("\n🤖 [AI Engine] Generating tests from blind spots...")
-    resp = await client.post(f"{WATCHDOG_URL}/api/generate")
+def generate_and_run_tests(client):
+    print("\n[AI Engine] Generating tests from blind spots...")
+    resp = client.post(f"{WATCHDOG_URL}/api/generate")
     data = resp.json()
-    print(f"  ✅ Generated {data['count']} test cases")
+    print(f"  Generated {data['count']} test cases")
 
-    print("\n🧪 [Test Runner] Executing generated tests...")
-    resp = await client.post(f"{WATCHDOG_URL}/api/run-tests")
+    print("\n[Test Runner] Executing generated tests...")
+    resp = client.post(f"{WATCHDOG_URL}/api/run-tests")
     results = resp.json().get("results", [])
     for r in results:
-        icon = "✅" if r["status"] == "PASSED" else "❌"
-        print(f"  {icon} {r['test_name']} → {r['status']}")
+        status = "PASS" if r["status"] == "PASSED" else "FAIL"
+        print(f"  [{status}] {r['test_name']}")
 
 
-async def main():
+def main():
     print("=" * 60)
-    print("🐕 WatchDog AI — Traffic Simulator")
+    print("  WatchDog AI - Traffic Simulator")
     print("=" * 60)
-    print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"WatchDog API: {WATCHDOG_URL}")
-    print(f"Sample App: {SAMPLE_APP_URL}")
+    print(f"  Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"  WatchDog API: {WATCHDOG_URL}")
+    print(f"  Sample App: {SAMPLE_APP_URL}")
     print("=" * 60)
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        await simulate_api_traffic(client)
-        await simulate_log_ingestion(client)
-        await simulate_ui_clicks(client)
-        await trigger_scans(client)
-        await generate_and_run_tests(client)
+    client = httpx.Client(timeout=30.0)
+    try:
+        simulate_api_traffic(client)
+        simulate_log_ingestion(client)
+        simulate_ui_clicks(client)
+        trigger_scans(client)
+        generate_and_run_tests(client)
+    finally:
+        client.close()
 
     print("\n" + "=" * 60)
-    print("✅ Simulation complete! Open http://localhost:3000 to see the dashboard.")
+    print("  Simulation complete! Open http://localhost:5173 for the dashboard.")
     print("=" * 60)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
