@@ -7,86 +7,93 @@ import httpx
 from typing import List, Dict, Optional
 
 
-# Pre-loaded real tickets from NiCE Jira (fetched via Atlassian API)
-# These are actual bugs from the system — used when live API is unavailable
+# Sample Jira tickets for demonstration purposes
 REAL_JIRA_TICKETS = [
     {
-        "key": "CARD-2670",
-        "summary": "[Accessibility][AI Studio] Expand/Collapse all control does not have a tooltip",
+        "key": "SHOP-1042",
+        "summary": "Cart total shows negative when 100% discount coupon applied with free shipping",
         "description": (
-            "Region: AI Studio. URL: Topic AI Editor. "
-            "Repro Step: AI Studio-> Topic AI->Agent Action-> Invoke Kanban View-> Tree list. "
-            "Actual Result: Expand/Collapse all button does not have a tooltip to indicate purpose. "
-            "When user tries to activate the control with mouse or keyboard it does not show instructions. "
-            "Expected Result: The Expand/Collapse All button should provide a descriptive tooltip "
-            "that clearly communicates its purpose when users hover over it."
+            "Steps to reproduce: "
+            "1. Add any item to cart. "
+            "2. Apply coupon code FREE100 (100% discount). "
+            "3. Select free shipping option. "
+            "4. Observe cart total. "
+            "Expected: Cart total should show $0.00. "
+            "Actual: Cart total shows -$5.99 (negative value from shipping calculation applied before discount). "
+            "This allows customers to place orders with negative totals."
         ),
-        "status": "New",
-        "project": "CXone Analytics Research Dev",
-        "priority": "Medium",
-    },
-    {
-        "key": "UH-80319",
-        "summary": "production-iesov1 saas-platform-ms-user-manager 6.38 deployment failed",
-        "description": (
-            "Deployment of origin/sprint/192 failed for saas-platform-ms-user-manager version 6.38 "
-            "on the production-iesov1 environment. "
-            "Steps: 1. Deploy saas-platform-ms-user-manager 6.38 to production-iesov1. "
-            "Expected: Deployment succeeds. "
-            "Actual: Deployment failed. Check Jenkins job for details. "
-            "Assignee: Snehal Hinge. Team: UserHub - Krypton."
-        ),
-        "status": "New",
-        "project": "CX_UserHub",
-        "priority": "High",
-    },
-    {
-        "key": "STO-18650",
-        "summary": "MI Case 02842839 - [Proactive] Possible Dropped calls",
-        "description": (
-            "Summary: Investigative KI for RCA of possible dropped calls. "
-            "Steps to Recreate: Possible simultaneous changes on A and B side. "
-            "CHG0186966 Change Request. "
-            "Carter Cordingley: Upgrade E35 COR SQL Servers to SQL 2022. "
-            "Axel Tadoy: NOC, starting below CHG0182592 F5 Upgrade for afa-int-adc0. "
-            "Expected: Calls should not be dropped during maintenance. "
-            "Actual: Calls were dropped during simultaneous infrastructure changes."
-        ),
-        "status": "New",
-        "project": "CX_Storage",
+        "status": "Open",
+        "project": "E-Commerce Platform",
         "priority": "Critical",
     },
     {
-        "key": "TEL-5760",
-        "summary": "production-iesov1 lambda-telemetry-instrumentation-autoscaler 1.10 deployment failed",
+        "key": "SHOP-1087",
+        "summary": "User profile update crashes when display name contains emoji characters",
         "description": (
-            "Deployment of origin/sprint/192 failed for lambda-telemetry-instrumentation-autoscaler "
-            "version 1.10 on the production-iesov1 environment. "
-            "Steps: 1. Deploy lambda-telemetry-instrumentation-autoscaler 1.10. "
-            "Expected: Lambda deployment succeeds. "
-            "Actual: Deployment failed. "
-            "Assignee: Payal Bhalke. Team: Telemetry."
+            "Steps to reproduce: "
+            "1. Navigate to Profile Settings page. "
+            "2. Edit display name to include emoji (e.g. 'John 🚀'). "
+            "3. Click Save. "
+            "Expected: Profile saves successfully with emoji in name. "
+            "Actual: Server returns 500 Internal Server Error. "
+            "Stack trace shows: UnicodeEncodeError in user_service.py line 142. "
+            "Affects all users trying to use emoji in profile fields."
         ),
-        "status": "New",
-        "project": "CX_Telemetry",
+        "status": "Open",
+        "project": "E-Commerce Platform",
         "priority": "High",
     },
     {
-        "key": "ORC-53275",
-        "summary": "Agents sometimes unable to hangup call when using Copilot",
+        "key": "SHOP-1103",
+        "summary": "Concurrent checkout causes duplicate orders when user double-clicks Place Order",
         "description": (
-            "Case#:02813465. Priority: P4. "
-            "Customer is attempting to use Copilot and is using CXone Agent Embedded. "
-            "Steps: 1. Agent receives call with Copilot enabled. "
-            "2. Agent attempts to hangup the call. "
-            "3. Hangup button does not respond. "
-            "Expected: Agent should be able to hangup call normally. "
-            "Actual: Hangup button is unresponsive when Copilot is active. "
-            "Workaround: Disable Copilot, then hangup works."
+            "Steps to reproduce: "
+            "1. Add items to cart and proceed to checkout. "
+            "2. Click 'Place Order' button rapidly (double-click). "
+            "3. Check order history. "
+            "Expected: Only one order is created. "
+            "Actual: Two identical orders are created and customer is charged twice. "
+            "No idempotency check on the POST /api/orders endpoint. "
+            "Customer reports: 'I was charged $299.98 instead of $149.99'."
         ),
-        "status": "New",
-        "project": "Orchestration",
-        "priority": "P4",
+        "status": "Open",
+        "project": "E-Commerce Platform",
+        "priority": "Critical",
+    },
+    {
+        "key": "SHOP-1118",
+        "summary": "Search API returns results for deleted products causing 404 on click",
+        "description": (
+            "Steps to reproduce: "
+            "1. Search for 'wireless headphones'. "
+            "2. Click on 'ProMax Wireless X200' in search results. "
+            "3. Observe error page. "
+            "Expected: Deleted products should not appear in search results. "
+            "Actual: Search index is not updated when products are deleted. "
+            "User sees product in search, clicks it, gets 404 Not Found. "
+            "Elasticsearch index out of sync with product database."
+        ),
+        "status": "Open",
+        "project": "E-Commerce Platform",
+        "priority": "Medium",
+    },
+    {
+        "key": "SHOP-1125",
+        "summary": "Password reset token never expires - security vulnerability",
+        "description": (
+            "Steps to reproduce: "
+            "1. Request password reset email. "
+            "2. Wait 7 days (or any amount of time). "
+            "3. Click the reset link from old email. "
+            "4. Successfully reset password. "
+            "Expected: Reset token should expire after 1 hour. "
+            "Actual: Token has no expiry - can be used weeks later. "
+            "Security risk: If reset email is intercepted, attacker has unlimited time to use it. "
+            "The token_expiry column in password_resets table is always NULL."
+        ),
+        "status": "Open",
+        "project": "E-Commerce Platform",
+        "priority": "Critical",
     },
 ]
 
