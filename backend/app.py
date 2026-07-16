@@ -41,6 +41,12 @@ class JiraInput(BaseModel):
     ticket_id: Optional[str] = None
 
 
+class JiraFetchInput(BaseModel):
+    project_key: Optional[str] = None
+    jql: Optional[str] = None
+    max_results: Optional[int] = 10
+
+
 class UIClickEvent(BaseModel):
     page: str
     element: str
@@ -98,6 +104,38 @@ async def analyze_jira(input: JiraInput):
     blindspot = jira_monitor.analyze_ticket(input.ticket_text, input.ticket_id)
     test_code = test_generator.generate_from_blindspot(blindspot)
     return {"blindspot": blindspot, "generated_test": test_code}
+
+
+@app.post("/api/jira-fetch")
+async def fetch_jira_tickets(input: JiraFetchInput):
+    """Fetch real bugs from Jira and analyze them for missing tests."""
+    import httpx
+
+    jira_base = "https://nice-ce-cxone-prod.atlassian.net"
+    jql = input.jql or f"project = {input.project_key} AND type = Bug AND created >= -30d ORDER BY created DESC"
+
+    # Use the Atlassian API via the backend
+    # For the prototype, we fetch from our stored Jira data
+    from monitors.jira_connector import JiraConnector
+    connector = JiraConnector()
+    tickets = connector.fetch_tickets(jql, input.max_results)
+
+    results = []
+    for ticket in tickets:
+        blindspot = jira_monitor.analyze_ticket(
+            ticket["description"],
+            ticket["key"]
+        )
+        test_code = test_generator.generate_from_blindspot(blindspot)
+        results.append({
+            "ticket_key": ticket["key"],
+            "summary": ticket["summary"],
+            "status": ticket["status"],
+            "blindspot": blindspot,
+            "generated_test": test_code,
+        })
+
+    return {"tickets_analyzed": len(results), "results": results}
 
 
 @app.post("/api/generate")
