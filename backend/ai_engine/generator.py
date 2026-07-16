@@ -7,7 +7,7 @@ from datetime import datetime
 class TestGenerator:
     def __init__(self):
         self.generated_tests: List[Dict] = []
-        self.use_bedrock = os.environ.get("USE_BEDROCK", "false").lower() == "true"
+        self.use_bedrock = True
 
     def generate_from_blindspot(self, blindspot: Dict) -> Dict:
         if self.use_bedrock:
